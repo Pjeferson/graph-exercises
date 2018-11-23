@@ -35,6 +35,7 @@ public class Maze {
          Vertex vertices[][] = new Vertex[maze.length][maze[0].length()];
          int n = 1;
          Vertex start = null;
+         Vertex end = null;
          for (int i = 0; i < maze.length; i++) {
              for (int j = 0; j < maze[i].length(); j++) {
                 //System.out.print(maze[i].charAt(j));
@@ -43,6 +44,7 @@ public class Maze {
                 s.insertVertex(v);
                 vertices[i][j] = v;
                 start = maze[i].charAt(j)=='2'?v:start;
+                end = maze[i].charAt(j)=='3'?v:end;
              }
              //System.out.print('\n');
          }
@@ -63,19 +65,75 @@ public class Maze {
              }
          }
          int[] path= new int[n];
-         Vector<Vertex> open = new Vector<>();
-         Vector<Vertex> closed = new Vector<>();
-         open.add(start);
-         Vector<Edge> inci = s.incidentsEdges(start);
-         Vector<Vertex> neighbors = s.neighbors(start);
-         
-         for (Vertex vertex : neighbors) {
-             System.out.println(vertex.getKey());
-         }
+         int[] f= new int[n];
+         int[] g= new int[n];
+         int[] h= new int[n];
 
+         for (int i = 0; i < n; i++) {
+             h[i]=f[i]=g[i]=0;
+         }
+         Vector<Vertex> openSet = new Vector<>();
+         Vector<Vertex> closedSet = new Vector<>();
+         openSet.add(start);
+         while(openSet.size()> 0) {
+             Vertex current = openSet.get(0);
+             for (Vertex vertex : openSet) {
+                 if(f[vertex.getKey()] < f[current.getKey()])
+                     current = vertex;
+             }
+             
+            if(current == end){
+                System.out.println("Finish");
+                int now = end.getKey();
+                Vector<Vertex> vv = s.vertices();
+                while(now != start.getKey()){
+                    System.out.print(now+" ");
+                    now = path[now];
+                    vv.get(now-1).setValue('8');
+                }
+                vv.get(now-1).setValue('2');
+                System.out.print("\n");
+                break;
+            }
+            
+            openSet.remove(current);
+            closedSet.add(current);
+            
+            Vector<Vertex> neighbors = s.neighbors(current);
+            for (Vertex neighbor : neighbors) {
+                if(!closedSet.contains(neighbor) && neighbor.getValue() != '1'){
+                    int tempG = g[current.getKey()]+1;
+                    
+                    if(openSet.contains(neighbor)){
+                        if (tempG < g[neighbor.getKey()]) {
+                            g[neighbor.getKey()] = tempG;
+                        }
+                    } else {
+                        g[neighbor.getKey()] = tempG;
+                        openSet.add(neighbor);
+                    }
+                    
+                    h[neighbor.getKey()] = heuristc(neighbor, end);
+                    f[neighbor.getKey()] = g[neighbor.getKey()]+h[neighbor.getKey()];
+                    path[neighbor.getKey()] = current.getKey();
+                }
+            }
+         }
+         
+        for (int i = 0; i < maze.length; i++) {
+             for (int j = 0; j < maze[i].length(); j++) {
+                
+                Vertex v = vertices[i][j];
+                System.out.print((int)v.getValue()-'0');
+             }
+             System.out.print('\n');
+         }
          //
 
          //s.printMatrix();
-         System.out.println(start);
+     }
+     
+     private static int heuristc (Vertex neighbor,Vertex end) {
+         return end.getKey()-neighbor.getKey();
      }
 }
