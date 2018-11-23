@@ -126,8 +126,19 @@ public class Graph {
     }
     
     public int degree(Vertex vertex){
-        //TO DO
-        return -1;
+        int degree = 0;
+        int index = findIndex(vertex.getKey());
+        for (int i = 0; i < vertexCount; i++) {
+            if(adjMatrix[i][index] != null && adjMatrix[i][index].isDirected()){
+                degree++;
+            }
+            if(adjMatrix[index][i] != null && adjMatrix[index][i].isDirected()){
+                degree++;
+            } else if(adjMatrix[index][i] != null){
+                degree++;
+            }
+        }
+        return degree;
     }
     
     public int order(){
@@ -146,33 +157,55 @@ public class Graph {
         return -1; // not finded
     }
     
-    public Vector vertices(){
+    public Vector<Vertex> vertices(){
         return vertices;
     }
 
-    public Vector Edges(){
-        Vector v=new Vector();
+    public Vector<Edge> Edges(){
+        Vector<Edge> v=new Vector();
         for(int l=0;l<vertexCount;l++)
             for(int c=0;c<vertexCount;c++)                
                 v.add(adjMatrix[l][c]);
         return v;
     }
     
-    public Vector incidentsEdges(Vertex vertex){
-        //TO DO
-        return null;
+    public Vector<Edge> incidentsEdges(Vertex vertex){
+        Vector<Edge> edges = new Vector();
+        int index = findIndex(vertex.getKey());
+        for (int i = 0; i < vertexCount; i++) {
+            if(adjMatrix[i][index] != null && adjMatrix[i][index].isDirected()){
+                edges.add(adjMatrix[i][index]);
+            }
+            if(adjMatrix[index][i] != null && adjMatrix[index][i].isDirected()){
+                edges.add(adjMatrix[index][i]);
+            } else if(adjMatrix[index][i] != null){
+                edges.add(adjMatrix[index][i]);
+            }
+        }
+        return edges;
     }
     
-    public Vector finalVertices(Edge edge){
-        Vector v=new Vector();
+    public Vector<Vertex> finalVertices(Edge edge){
+        Vector<Vertex> v=new Vector();
         v.add(edge.getStartVertex());
         v.add(edge.getEndVertex());
         return v;
     }
     
+    public Vector<Vertex> neighbors(Vertex vertex){
+        Vector<Vertex> v=new Vector();
+        int index = findIndex(vertex.getKey());
+        for (int i = 0; i < vertexCount; i++) {
+            if(adjMatrix[index][i] != null){
+                v.add((Vertex)vertices.get(i));
+            }
+        }
+        return v;
+    }
+    
     /*
     public Vertex oposto(Vertex v,Edge e) throws OpostoError {
-     // mÃ©todo exercÃ­cio, fique a vontade para implementa-lo coleguinha   
+     // método exercício, fique a vontade para implementa-lo coleguinha   
     }
     */
     
