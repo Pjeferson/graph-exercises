@@ -1,20 +1,13 @@
 import java.util.Vector;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-String[] maze = {
-  "1111111111" ,
-  "1000000001" ,
-  "1200010101" ,
-  "1111010101" ,
-  "1000000101" ,
-  "1011111103" ,
-  "1000000001" ,
-  "1111111101" ,
-  "3100100001" ,
-  "1101001111" ,
-  "1000000301" ,
-  "1111111111"
- };
  Graph s;
+ String[] maze;
  int n,h,w, size;
  Vertex vertices[][];
  Vector<Vertex> outs;
@@ -25,9 +18,11 @@ String[] maze = {
  
  void setup(){
    size(640,480);
+  
    n=1;
    size=20;
    
+   maze = loadStrings("../map.dat");
    h=maze.length;
    w=maze[0].length();
    
