@@ -6,14 +6,13 @@
 
 package graphexercises.algorithms;
 
-import graphexercises.graph.Edge;
 import graphexercises.graph.Graph;
 import graphexercises.graph.Vertex;
 import java.util.Vector;
 
 /**
  *
- * @author Usuario
+ * @author pjeferson
  */
 public class Maze {
      public static void main(String[] args) {
@@ -35,105 +34,126 @@ public class Maze {
          Vertex vertices[][] = new Vertex[maze.length][maze[0].length()];
          int n = 1;
          Vertex start = null;
-         Vertex end = null;
-         for (int i = 0; i < maze.length; i++) {
-             for (int j = 0; j < maze[i].length(); j++) {
-                //System.out.print(maze[i].charAt(j));
-                
-                Vertex v = new Vertex(n++,maze[i].charAt(j));
-                s.insertVertex(v);
-                vertices[i][j] = v;
-                start = maze[i].charAt(j)=='2'?v:start;
-                end = maze[i].charAt(j)=='3'?v:end;
-             }
-             //System.out.print('\n');
-         }
-         for (int i = 0; i < maze.length; i++) {
-             for (int j = 0; j < maze[i].length(); j++) {
-                if(i-1 > -1){
-                    s.insertEdge(vertices[i][j], vertices[i-1][j]);
-                }
-                if(i+1 < maze.length){
-                    s.insertEdge(vertices[i][j], vertices[i+1][j]);
-                }
-                if(j-1 > -1){
-                    s.insertEdge(vertices[i][j], vertices[i][j-1]);
-                }
-                if(j+1 < maze[i].length()){
-                    s.insertEdge(vertices[i][j], vertices[i][j+1]);
-                }
-             }
-         }
-         int[] path= new int[n];
-         int[] f= new int[n];
-         int[] g= new int[n];
-         int[] h= new int[n];
+         Vector<Vertex> outs = new  Vector();
+         int h=maze.length;
+         int w=maze[0].length();
+         for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+               Vertex v = new Vertex(n++,maze[i].charAt(j), i,j,0,0,0);
 
-         for (int i = 0; i < n; i++) {
-             h[i]=f[i]=g[i]=0;
-         }
-         Vector<Vertex> openSet = new Vector<>();
-         Vector<Vertex> closedSet = new Vector<>();
-         openSet.add(start);
-         while(openSet.size()> 0) {
-             Vertex current = openSet.get(0);
-             for (Vertex vertex : openSet) {
-                 if(f[vertex.getKey()] < f[current.getKey()])
-                     current = vertex;
-             }
-             
-            if(current == end){
+               s.insertVertex(v);
+               vertices[i][j] = v;
+               start = v.getC() == '2'?v:start;
+               if(v.getC()=='3') outs.add(v);
+            }
+        }
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+               if(i-1 > -1){
+                   s.insertEdge(vertices[i][j], vertices[i-1][j]);
+               }
+               if(i+1 < h){
+                   s.insertEdge(vertices[i][j], vertices[i+1][j]);
+               }
+               if(j-1 > -1){
+                   s.insertEdge(vertices[i][j], vertices[i][j-1]);
+               }
+               if(j+1 < w){
+                   s.insertEdge(vertices[i][j], vertices[i][j+1]);
+               }
+
+               //Horizontal
+               /*if(i-1 > -1 && j-1 > -1){
+                   s.insertEdge(vertices[i][j], vertices[i-1][j-1]);
+               }
+               if(i-1 > -1 && j+1 <w){
+                   s.insertEdge(vertices[i][j], vertices[i-1][j+1]);
+               }
+               if(i+1 < h && j+1 < w){
+                   s.insertEdge(vertices[i][j], vertices[i+1][j+1]);
+               }
+               if(i+1 < h && j-1 < -1){
+                   s.insertEdge(vertices[i][j], vertices[i+1][j-1]);
+               }*/
+            }
+        }
+        int path[] = new int[n];
+        Vector<Vertex> openSet = new Vector<>();
+        Vector<Vertex> closedSet = new Vector<>();
+        openSet.add(start);
+
+       
+         
+        while(openSet.size()> 0) {
+            Vertex current = openSet.get(0);
+            for (Vertex vertex : openSet) {
+                if(vertex.getF() < current.getF())
+                    current = vertex;
+            }
+
+            if(current.getC() == '3'){
                 System.out.println("Finish");
-                int now = end.getKey();
+                int now = current.getKey();
                 Vector<Vertex> vv = s.vertices();
                 while(now != start.getKey()){
                     System.out.print(now+" ");
                     now = path[now];
-                    vv.get(now-1).setValue('8');
+                    vv.get(now-1).setC('*');
                 }
-                vv.get(now-1).setValue('2');
+                vv.get(now-1).setC('2');
                 System.out.print("\n");
+                
+                for (int i = 0; i < h; i++) {
+                    for (int j = 0; j < w; j++) {
+                        Vertex v = vertices[i][j];
+                        System.out.print(v.getC());
+                    }
+                    System.out.print('\n');
+                }
                 break;
-            }
-            
-            openSet.remove(current);
-            closedSet.add(current);
-            
-            Vector<Vertex> neighbors = s.neighbors(current);
+           }
+
+           openSet.remove(current);
+           closedSet.add(current);
+
+           Vector<Vertex> neighbors = s.neighbors(current);
             for (Vertex neighbor : neighbors) {
-                if(!closedSet.contains(neighbor) && neighbor.getValue() != '1'){
-                    int tempG = g[current.getKey()]+1;
-                    
+                if(!closedSet.contains(neighbor) && neighbor.getC() != '1'){
+                    int tempG = current.getG()+1;
+
+                    boolean newPath = false;
                     if(openSet.contains(neighbor)){
-                        if (tempG < g[neighbor.getKey()]) {
-                            g[neighbor.getKey()] = tempG;
+                        if (tempG < neighbor.getG()) {
+                            neighbor.setG(tempG);
+                            newPath = true;
                         }
                     } else {
-                        g[neighbor.getKey()] = tempG;
+                        neighbor.setG(tempG);
                         openSet.add(neighbor);
+                        newPath = true;
                     }
-                    
-                    h[neighbor.getKey()] = heuristc(neighbor, end);
-                    f[neighbor.getKey()] = g[neighbor.getKey()]+h[neighbor.getKey()];
-                    path[neighbor.getKey()] = current.getKey();
+                    if(newPath){
+                      neighbor.setH(heuristc(neighbor, outs));
+                      neighbor.setF(neighbor.getG()+neighbor.getH());
+                      path[neighbor.getKey()] = current.getKey();
+                    }
                 }
             }
-         }
-         
-        for (int i = 0; i < maze.length; i++) {
-             for (int j = 0; j < maze[i].length(); j++) {
-                
-                Vertex v = vertices[i][j];
-                System.out.print((int)v.getValue()-'0');
-             }
-             System.out.print('\n');
-         }
-         //
-
-         //s.printMatrix();
-     }
-     
-     private static int heuristc (Vertex neighbor,Vertex end) {
-         return end.getKey()-neighbor.getKey();
-     }
+        }
+    }
+    public static int heuristc(Vertex neighbor,Vector<Vertex> outs) {
+        int minDist = Integer.MAX_VALUE;
+        for (Vertex vertex : outs) {
+            // Manhattan
+            int dist = Math.abs(neighbor.getX() - vertex.getX()) + Math.abs(neighbor.getY() - vertex.getY());
+            // Euclidian
+            /*float xdif = Math.abs(neighbor.getX() - vertex.getX());
+            float ydif = Math.abs(neighbor.getY() - vertex.getY());
+            int dist = (int) Math.sqrt((xdif)*(xdif) +(ydif)*(ydif));*/
+            if(dist < minDist){
+                minDist = dist;
+            }
+        }
+        return minDist;
+    }
 }
