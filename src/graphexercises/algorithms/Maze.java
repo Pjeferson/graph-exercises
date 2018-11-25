@@ -8,36 +8,35 @@ package graphexercises.algorithms;
 
 import graphexercises.graph.Graph;
 import graphexercises.graph.Vertex;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author pjeferson
  */
 public class Maze {
-     public static void main(String[] args) {
-         String[] maze = {
-            "1111111111" ,
-            "1000000001" ,
-            "1200010101" ,
-            "1111010101" ,
-            "1000000101" ,
-            "1011111103" ,
-            "1000000001" ,
-            "1111111101" ,
-            "3100100001" ,
-            "1101001111" ,
-            "1000000301" ,
-            "1111111111"
-         };
-         Graph s = new Graph();
-         Vertex vertices[][] = new Vertex[maze.length][maze[0].length()];
-         int n = 1;
-         Vertex start = null;
-         Vector<Vertex> outs = new  Vector();
-         int h=maze.length;
-         int w=maze[0].length();
-         for (int i = 0; i < h; i++) {
+    public static void main(String[] args) {
+        String map = null;
+        try {
+            map = new String(Files.readAllBytes(Paths.get("map.dat")));
+        } catch (IOException ex) {
+            Logger.getLogger(Maze.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        String[] maze = map.split("\n");
+        Graph s = new Graph();
+        Vertex vertices[][] = new Vertex[maze.length][maze[0].length()];
+        int n = 1;
+        Vertex start = null;
+        Vector<Vertex> outs = new  Vector();
+        int h=maze.length;
+        int w=maze[0].length();
+        for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
                Vertex v = new Vertex(n++,maze[i].charAt(j), i,j,0,0,0);
 
