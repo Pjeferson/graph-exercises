@@ -30,12 +30,13 @@ public class Maze {
 
         String[] maze = map.split("\n");
         Graph s = new Graph();
-        Vertex vertices[][] = new Vertex[maze.length][maze[0].length()];
         int n = 1;
-        Vertex start = null;
-        Vector<Vertex> outs = new  Vector();
         int h=maze.length;
         int w=maze[0].length();
+        Vertex vertices[][] = new Vertex[h][w];
+        Vertex start = null;
+        Vector<Vertex> outs = new  Vector();
+        
         for (int i = 0; i < h; i++) {
             for (int j = 0; j < w; j++) {
                Vertex v = new Vertex(n++,maze[i].charAt(j), i,j,0,0,0);
